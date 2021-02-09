@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: listener
+spec:
+  selector:
+    matchLabels:
+      app: listener
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: listener
+    spec:
+      containers:
+      - name: listener
+        image: andrelramos/listener-event-driven-platform
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        env:
+        - name: REDIS_HOST
+          value: redis://redis.default.svc.cluster.local
+        - name: PYTHONUNBUFFERED
+          value: "0"
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: listener-scaledobject
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: listener
+  pollingInterval: 60
+  cooldownPeriod:  5
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  triggers:
+  - type: redis
+    metadata:
+      address: redis.default.svc.cluster.local:6379
+      listName: events
+      listLength: "5"
