@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: listener
+  name: prices
 spec:
   selector:
     matchLabels:
-      app: listener
+      app: prices
   replicas: 1
   template:
     metadata:
       labels:
-        app: listener
+        app: prices
     spec:
       containers:
-      - name: listener
+      - name: prices
         image: andrelramos/listener-event-driven-platform
         resources:
           limits:
@@ -31,18 +31,18 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: listener-scaledobject
+  name: prices-scaledobject
 spec:
   scaleTargetRef:
     kind: Deployment
-    name: listener
+    name: prices
   pollingInterval: 60
   cooldownPeriod:  5
-  minReplicaCount: 0
+  minReplicaCount: 1
   maxReplicaCount: 5
   triggers:
   - type: redis
     metadata:
       address: redis.default.svc.cluster.local:6379
-      listName: events
+      listName: shares
       listLength: "5"

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: per
+spec:
+  selector:
+    matchLabels:
+      app: per
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: per
+    spec:
+      containers:
+      - name: per
+        image: andrelramos/price-earnings-ratio-event-driven-platform
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        env:
+        - name: REDIS_HOST
+          value: redis://redis.default.svc.cluster.local
+        - name: REDIS_CACHE_HOST
+          value: redis://cache.default.svc.cluster.local
+        - name: PYTHONUNBUFFERED
+          value: "0"
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: per-scaledobject
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: per
+  pollingInterval: 60
+  cooldownPeriod:  5
+  minReplicaCount: 0
+  maxReplicaCount: 5
+  triggers:
+  - type: redis
+    metadata:
+      address: redis.default.svc.cluster.local:6379
+      listName: prices
+      listLength: "5"
