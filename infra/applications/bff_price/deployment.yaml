@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff-price
+spec:
+  selector:
+    matchLabels:
+      app: bff-price
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bff-price
+    spec:
+      containers:
+      - name: bff-price
+        image: andrelramos/bff-price-event-driven-platform
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 200Mi
+        env:
+        - name: SHARES_API_ROUTE
+          value: http://shares-api.default.svc.cluster.local
+        - name: PYTHONUNBUFFERED
+          value: "0"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff-price
+spec:
+  selector:
+    app: bff-price
+  ports:
+  - port: 8080
+    targetPort: 8080

@@ -38,10 +38,10 @@ spec:
   scaleTargetRef:
     kind: Deployment
     name: per
-  pollingInterval: 60
-  cooldownPeriod:  5
+  pollingInterval: 5
+  cooldownPeriod:  10
   minReplicaCount: 0
-  maxReplicaCount: 5
+  maxReplicaCount: 1
   triggers:
   - type: redis
     metadata:
