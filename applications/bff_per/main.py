@@ -6,7 +6,7 @@ SHARES_API_ROUTE = os.getenv("SHARES_API_ROUTE")
 
 @route('/api/per/<share>')
 def index(share: str):
-    payload = requests.get(f"{SHARES_API_ROUTE}/api/search/{share}").json()
+    payload = requests.get(f"{SHARES_API_ROUTE}/api/search/{share}?version=v1").json()
 
     return {
         "share": share,
