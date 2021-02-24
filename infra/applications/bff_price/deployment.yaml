@@ -24,7 +24,7 @@ spec:
             memory: 200Mi
         env:
         - name: SHARES_API_ROUTE
-          value: http://shares-api.default.svc.cluster.local
+          value: http://10.100.70.98
         - name: PYTHONUNBUFFERED
           value: "0"
 ---
